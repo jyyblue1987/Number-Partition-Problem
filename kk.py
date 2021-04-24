@@ -187,7 +187,8 @@ def main():
     SA_pp_time = 0
 
     if len(sys.argv) > 1:
-        inputfile = sys.argv[1]
+        algorithm = int(sys.argv[2])
+        inputfile = sys.argv[3]
         fp = open(inputfile, "r")
         lines = fp.readlines()
         fp.close()
@@ -196,82 +197,102 @@ def main():
         for row in lines:
             instance.append(int(row))
 
-        result = karmarkar_karp(np.array(instance))
-        print("Residual =", result)
+        instance = np.array(instance)
 
-    for i in range(trials):
+        result = 0
         stan_start = rand_solution_standard(size)
         pp_start = rand_solution_prepartition(size)
+
+        if algorithm == 0: 
+            result = karmarkar_karp(instance)               
+        elif algorithm == 1: 
+            result = repeated_random_using_standard(size, instance, max_iter, stan_start)
+        elif algorithm == 2: 
+            result = hill_climb_standard(size, instance, max_iter, stan_start)
+        elif algorithm == 3: 
+            result = hill_climb_standard(size, instance, max_iter, stan_start)
+        elif algorithm == 11: 
+            result = repeated_random_using_prepartition(size, instance, max_iter, pp_start)
+        elif algorithm == 12: 
+            result = hill_climb_prepartition(size, instance, max_iter, pp_start)            
+        elif algorithm == 13: 
+            result = simulated_annealing_prepartition(size, instance, max_iter, pp_start)
+        print(result)
+
+    else:
+        for i in range(trials):
+            stan_start = rand_solution_standard(size)
+            pp_start = rand_solution_prepartition(size)
+            
+            instance = generate_randomize_instance(size)
+
+            #karmarkar_karp 
+            start = time.time()
+            KK_sum += karmarkar_karp(instance)
+            end = time.time()
+            KK_time += (end - start)
+            
+            #RR_stan
+            start = time.time()
+            RR_stan += repeated_random_using_standard(size, instance, max_iter, stan_start)
+            end = time.time()
+            RR_stan_time += (end - start)
+            
+            #RR_pp
+            start = time.time()
+            RR_pp += repeated_random_using_prepartition(size, instance, max_iter, pp_start)
+            end = time.time()
+            RR_pp_time += (end - start)
+
+            #HC_stan
+            start = time.time()
+            HC_stan += hill_climb_standard(size, instance, max_iter, stan_start)
+            end = time.time()
+            HC_stan_time += (end - start)
+
+            #HC_pp
+            start = time.time()
+            HC_pp += hill_climb_prepartition(size, instance, max_iter, pp_start)
+            end = time.time()
+            HC_pp_time += (end - start)
+
+            #SA_stan
+            start = time.time()
+            SA_stan += simulated_annealing_standard(size, instance, max_iter, stan_start)
+            end = time.time()
+            SA_stan_time += (end - start)
+
+            #SA_pp
+            start = time.time()
+            SA_pp += simulated_annealing_prepartition(size, instance, max_iter, pp_start)
+            end = time.time()
+            SA_pp_time += (end - start)
+
+        end_all = time.time()
+        time_all = end_all - start_all
         
-        instance = generate_randomize_instance(size)
-
-        #karmarkar_karp 
-        start = time.time()
-        KK_sum += karmarkar_karp(instance)
-        end = time.time()
-        KK_time += (end - start)
+        print("KK avg: ", int(KK_sum/trials))
+        print("avg time: ", KK_time/trials)
+        print("\n")
+        print("RR_stan avg: ", int(RR_stan/trials))
+        print("avg time: ", RR_stan_time/trials)
+        print("\n")
+        print("RR_pp avg: ", int(RR_pp/trials))
+        print("avg time: ", RR_pp_time/trials)
+        print("\n")
+        print("HC_stan avg: ", int(HC_stan/trials))
+        print("avg time: ", HC_stan_time/trials)
+        print("\n")
+        print("HC_pp avg: ", int(HC_pp/trials))
+        print("avg time: ", HC_pp_time/trials)
+        print("\n")
+        print("SA_stan avg: ", int(SA_stan/trials))
+        print("avg time: ", SA_stan_time/trials)
+        print("\n")
+        print("SA_pp avg: ", int(SA_pp/trials))
+        print("avg time: ", SA_pp_time/trials)
+        print("\n")
         
-        #RR_stan
-        start = time.time()
-        RR_stan += repeated_random_using_standard(size, instance, max_iter, stan_start)
-        end = time.time()
-        RR_stan_time += (end - start)
+        print("time_all: ", time_all)
         
-        #RR_pp
-        start = time.time()
-        RR_pp += repeated_random_using_prepartition(size, instance, max_iter, pp_start)
-        end = time.time()
-        RR_pp_time += (end - start)
-
-        #HC_stan
-        start = time.time()
-        HC_stan += hill_climb_standard(size, instance, max_iter, stan_start)
-        end = time.time()
-        HC_stan_time += (end - start)
-
-        #HC_pp
-        start = time.time()
-        HC_pp += hill_climb_prepartition(size, instance, max_iter, pp_start)
-        end = time.time()
-        HC_pp_time += (end - start)
-
-        #SA_stan
-        start = time.time()
-        SA_stan += simulated_annealing_standard(size, instance, max_iter, stan_start)
-        end = time.time()
-        SA_stan_time += (end - start)
-
-        #SA_pp
-        start = time.time()
-        SA_pp += simulated_annealing_prepartition(size, instance, max_iter, pp_start)
-        end = time.time()
-        SA_pp_time += (end - start)
-
-    end_all = time.time()
-    time_all = end_all - start_all
-    
-    print("KK avg: ", int(KK_sum/trials))
-    print("avg time: ", KK_time/trials)
-    print("\n")
-    print("RR_stan avg: ", int(RR_stan/trials))
-    print("avg time: ", RR_stan_time/trials)
-    print("\n")
-    print("RR_pp avg: ", int(RR_pp/trials))
-    print("avg time: ", RR_pp_time/trials)
-    print("\n")
-    print("HC_stan avg: ", int(HC_stan/trials))
-    print("avg time: ", HC_stan_time/trials)
-    print("\n")
-    print("HC_pp avg: ", int(HC_pp/trials))
-    print("avg time: ", HC_pp_time/trials)
-    print("\n")
-    print("SA_stan avg: ", int(SA_stan/trials))
-    print("avg time: ", SA_stan_time/trials)
-    print("\n")
-    print("SA_pp avg: ", int(SA_pp/trials))
-    print("avg time: ", SA_pp_time/trials)
-    print("\n")
-    
-    print("time_all: ", time_all)
-    
 main()
