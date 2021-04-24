@@ -3,9 +3,10 @@ import copy
 import math
 import time
 import sys
+import numpy as np
 
 def karmarkar_karp(A):
-    S = copy.copy(A)
+    S = A.tolist()
     residual = 0
     while True:
         a = max(S)
@@ -22,16 +23,14 @@ def karmarkar_karp(A):
 
 def generate_randomize_instance(size):
     r_max = 10**12
-    return [random.randint(1, r_max) for i in range(size)]
+    return np.random.randint(r_max, size=size, dtype=np.int64)    
 
 #RepRandom -- Stan
 def rand_solution_standard(size):
-    return [1 if (random.random() < 0.5) else -1 for i in range(size)]
-
+    return np.random.randint(2, size=size, dtype=np.int64) * 2 - 1
+    
 def calc_residual_using_standard(size, A, S):
-    residual = 0
-    for i in range(size):
-        residual += A[i] * S[i]
+    residual = np.dot(A, S)        
     return abs(residual)
 
 def repeated_random_using_standard(size, A, max_iter, start):
@@ -44,21 +43,17 @@ def repeated_random_using_standard(size, A, max_iter, start):
 
 #RepRandom -- PP
 def rand_solution_prepartition(size):
-    P = []
-    for i in range(size):
-        p = int(random.random() * size)
-        P.append(p)
-    return P
+    return np.random.randint(size, size=size, dtype=np.int64).tolist()    
 
 def new_sequence_from_prepartition(size, P, A):
-    A_prime = copy.copy(A)
+    # A_prime = copy.copy(A)
+    A_prime = A.tolist()
     for j in range(size):
         if P[j] != j:
             temp = A[j]
             A_prime[P[j]] += temp
             A_prime[j] -= temp
-    return A_prime
-    
+    return np.array(A_prime)
     
 
 def repeated_random_using_prepartition(size, A, max_iter, start):
@@ -153,10 +148,6 @@ def simulated_annealing_prepartition(size, A, max_iter, start):
 
 
 def main():
-    A = [10, 8, 7, 6, 5]
-    P = [0, 1, 1, 3, 4]
-    A1 = new_sequence_from_prepartition(5, P, A)
-    
     start_all = time.time()
     
     random.seed()
@@ -191,7 +182,7 @@ def main():
         for row in lines:
             instance.append(int(row))
 
-        result = karmarkar_karp(instance)
+        result = karmarkar_karp(np.array(instance))
         print("Residual =", result)
 
     for i in range(trials):
