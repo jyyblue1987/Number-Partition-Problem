@@ -7,9 +7,7 @@ import numpy as np
 
 import heapq
 
-def heapify(x):
-    for i in range(0, len(x)):
-        x[i] = -x[i]
+def heapify(x):   
     heapq.heapify(x)
 
 def push(heap, item):
@@ -23,7 +21,7 @@ def build_heap(num_arr):
     return num_arr
 
 def karmarkar_karp(A):
-    S = A.tolist()    
+    S = (A * (-1)).tolist()    
     heap = build_heap(S)
     elem1 = pop(heap)
     elem2 = pop(heap)
