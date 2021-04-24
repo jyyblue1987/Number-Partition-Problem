@@ -4,7 +4,7 @@ import math
 import time
 import sys
 
-def KK(A):
+def KarmarkarKarp(A):
     S = copy.copy(A)
     residue = 0
     while True:
@@ -69,9 +69,9 @@ def rept_rand_pp(size, A, max_iter, start):
     S = new_A(size, start, A)
     for i in range(max_iter):
         S_1 = new_A(size, rand_soln_pp(size), A)
-        if KK(S_1) < KK(S):
+        if KarmarkarKarp(S_1) < KarmarkarKarp(S):
             S = S_1
-    return KK(S)
+    return KarmarkarKarp(S)
 
 #HillClimb -- Stan
 def rand_neighbor_stan(size, S):
@@ -112,15 +112,15 @@ def hill_climb_pp(size, A, max_iter, start):
     for x in range(max_iter):
         P_1 = rand_neighbor_pp(size, P)
         S_1 = new_A(size, P_1, A)
-        if KK(S_1) < KK(S):
+        if KarmarkarKarp(S_1) < KarmarkarKarp(S):
             S = S_1
-    return KK(S)
+    return KarmarkarKarp(S)
 
 #SimAn -- Stan
 def T(x):
     return (10**10)*(0.8 ** (x/300))
 
-def sim_anneal_stan(size, A, max_iter, start):
+def simulated_annealing_stan(size, A, max_iter, start):
     S = start
     S_2 = copy.copy(S)
     for i in range(max_iter):
@@ -135,25 +135,25 @@ def sim_anneal_stan(size, A, max_iter, start):
             S_2 = copy.copy(S)
     return stan_res(size, A, S_2)
 
-#SimAn -- PP
-def sim_anneal_pp(size, A, max_iter, start):
+#Simulated Annealing -- PP
+def simulated_annealing_pp(size, A, max_iter, start):
     P = start
     P_2 = copy.copy(P)
-    res_0 = KK(new_A(size, P, A))
-    res_2 = KK(new_A(size, P_2, A))
+    res_0 = KarmarkarKarp(new_A(size, P, A))
+    res_2 = KarmarkarKarp(new_A(size, P_2, A))
     for i in range(max_iter):
         P_1 = rand_neighbor_pp(size, P)
-        res_1 = KK(new_A(size, P_1, A))
+        res_1 = KarmarkarKarp(new_A(size, P_1, A))
         if res_1 < res_0:
             P = P_1
-            res_0 = KK(new_A(size, P, A))
+            res_0 = KarmarkarKarp(new_A(size, P, A))
         elif random.random() < math.exp(-(res_1 - res_0)/T(i)):
             P = P_1
-            res_0 = KK(new_A(size, P, A))
+            res_0 = KarmarkarKarp(new_A(size, P, A))
         if res_0 < res_2:
             P_2 = copy.copy(P)
-            res_2 = KK(new_A(size, P_2, A))
-    return KK(new_A(size, P_2, A))
+            res_2 = KarmarkarKarp(new_A(size, P_2, A))
+    return KarmarkarKarp(new_A(size, P_2, A))
 
 
 def main():
@@ -165,8 +165,8 @@ def main():
     
     random.seed()
     size = 100
-    max_iter = 25000
-    # max_iter = 10
+    # max_iter = 25000
+    max_iter = 10
     trials = 50
     
     RR_stan = 0
@@ -195,7 +195,7 @@ def main():
         for row in lines:
             instance.append(int(row))
 
-        result = KK(instance)
+        result = KarmarkarKarp(instance)
         print("Residual =", result)
 
     for i in range(trials):
@@ -204,9 +204,9 @@ def main():
         
         instance = gen_instance(size)
 
-        #KK 
+        #KarmarkarKarp 
         start = time.time()
-        KK_sum += KK(instance)
+        KK_sum += KarmarkarKarp(instance)
         end = time.time()
         KK_time += (end - start)
         
@@ -236,20 +236,20 @@ def main():
 
         #SA_stan
         start = time.time()
-        SA_stan += sim_anneal_stan(size, instance, max_iter, stan_start)
+        SA_stan += simulated_annealing_stan(size, instance, max_iter, stan_start)
         end = time.time()
         SA_stan_time += (end - start)
 
         #SA_pp
         start = time.time()
-        SA_pp += sim_anneal_pp(size, instance, max_iter, pp_start)
+        SA_pp += simulated_annealing_pp(size, instance, max_iter, pp_start)
         end = time.time()
         SA_pp_time += (end - start)
 
     end_all = time.time()
     time_all = end_all - start_all
     
-    print("KK avg: ", int(KK_sum/trials))
+    print("KarmarkarKarp avg: ", int(KK_sum/trials))
     print("avg time: ", KK_time/trials)
     print("\n")
     print("RR_stan avg: ", int(RR_stan/trials))
