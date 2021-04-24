@@ -4,9 +4,9 @@ import math
 import time
 import sys
 
-def KarmarkarKarp(A):
+def karmarkar_karp(A):
     S = copy.copy(A)
-    residue = 0
+    residual = 0
     while True:
         a = max(S)
         i = S.index(a)
@@ -17,44 +17,44 @@ def KarmarkarKarp(A):
         j = S.index(b)
         S[i] = abs(a - b)
         S[j] = 0
-        residue = S[i]
-    return residue
+        residual = S[i]
+    return residual
 
-def gen_instance(size):
+def generate_randomize_instance(size):
     r_max = 10**12
     return [random.randint(1, r_max) for i in range(size)]
 
 #RepRandom -- Stan
-def rand_soln_stan(size):
+def rand_solution_standard(size):
     S = []
     for i in range(size):
         s = 1 if (random.random() < 0.5) else -1
         S.append(s)
     return S
 
-def stan_res(size, A, S):
-    residue = 0
+def calc_residual_using_standard(size, A, S):
+    residual = 0
     for i in range(size):
-        residue += A[i] * S[i]
-    return abs(residue)
+        residual += A[i] * S[i]
+    return abs(residual)
 
-def rept_rand_stan(size, A, max_iter, start):
+def repeated_random_using_standard(size, A, max_iter, start):
     S = start
     for i in range(max_iter):
-        S_1 = rand_soln_stan(size)
-        if stan_res(size, A, S_1) < stan_res(size, A, S):
+        S_1 = rand_solution_standard(size)
+        if calc_residual_using_standard(size, A, S_1) < calc_residual_using_standard(size, A, S):
             S = S_1
-    return stan_res(size, A, S)
+    return calc_residual_using_standard(size, A, S)
 
 #RepRandom -- PP
-def rand_soln_pp(size):
+def rand_solution_prepartition(size):
     P = []
     for i in range(size):
         p = int(random.random() * size)
         P.append(p)
     return P
 
-def new_A(size, P, A):
+def new_sequence_from_prepartition(size, P, A):
     A_prime = copy.copy(A)
     for j in range(size):
         if P[j] != j:
@@ -65,16 +65,16 @@ def new_A(size, P, A):
     
     
 
-def rept_rand_pp(size, A, max_iter, start):
-    S = new_A(size, start, A)
+def repeated_random_using_prepartition(size, A, max_iter, start):
+    S = new_sequence_from_prepartition(size, start, A)
     for i in range(max_iter):
-        S_1 = new_A(size, rand_soln_pp(size), A)
-        if KarmarkarKarp(S_1) < KarmarkarKarp(S):
+        S_1 = new_sequence_from_prepartition(size, rand_solution_prepartition(size), A)
+        if karmarkar_karp(S_1) < karmarkar_karp(S):
             S = S_1
-    return KarmarkarKarp(S)
+    return karmarkar_karp(S)
 
 #HillClimb -- Stan
-def rand_neighbor_stan(size, S):
+def rand_neighbor_standard(size, S):
     X = copy.copy(S)
     i = int(random.random() * size)
     j = int(random.random() * size)
@@ -85,19 +85,19 @@ def rand_neighbor_stan(size, S):
         X[j] *= -1
     return X
             
-def hill_climb_stan(size, A, max_iter, start):
+def hill_climb_standard(size, A, max_iter, start):
     S = start
-    res_0 = stan_res(size, A, S)
+    res_0 = calc_residual_using_standard(size, A, S)
     for x in range(max_iter):
-        S_1 = rand_neighbor_stan(size, S)
-        res_1 = stan_res(size, A, S_1)
+        S_1 = rand_neighbor_standard(size, S)
+        res_1 = calc_residual_using_standard(size, A, S_1)
         if res_1 < res_0:
             S = S_1
-            res_0 = stan_res(size, A, S)
-    return stan_res(size, A, S)
+            res_0 = calc_residual_using_standard(size, A, S)
+    return calc_residual_using_standard(size, A, S)
 
 # HillClimb -- PP
-def rand_neighbor_pp(size, P):
+def rand_neighbor_prepartition(size, P):
     X = copy.copy(P)
     i = int(random.random() * size)
     j = int(random.random() * size)
@@ -106,60 +106,60 @@ def rand_neighbor_pp(size, P):
     X[i] = j
     return X
 
-def hill_climb_pp(size, A, max_iter, start):
+def hill_climb_prepartition(size, A, max_iter, start):
     P = start
-    S = new_A(size, P, A)
+    S = new_sequence_from_prepartition(size, P, A)
     for x in range(max_iter):
-        P_1 = rand_neighbor_pp(size, P)
-        S_1 = new_A(size, P_1, A)
-        if KarmarkarKarp(S_1) < KarmarkarKarp(S):
+        P_1 = rand_neighbor_prepartition(size, P)
+        S_1 = new_sequence_from_prepartition(size, P_1, A)
+        if karmarkar_karp(S_1) < karmarkar_karp(S):
             S = S_1
-    return KarmarkarKarp(S)
+    return karmarkar_karp(S)
 
 #SimAn -- Stan
 def T(x):
     return (10**10)*(0.8 ** (x/300))
 
-def simulated_annealing_stan(size, A, max_iter, start):
+def simulated_annealing_standard(size, A, max_iter, start):
     S = start
     S_2 = copy.copy(S)
     for i in range(max_iter):
-        S_1 = rand_neighbor_stan(size, S) 
-        res_0 = stan_res(size, A, S)
-        res_1 = stan_res(size, A, S_1)
+        S_1 = rand_neighbor_standard(size, S) 
+        res_0 = calc_residual_using_standard(size, A, S)
+        res_1 = calc_residual_using_standard(size, A, S_1)
         if res_1 < res_0:
             S = S_1
         elif random.random() < math.exp(-(res_1 - res_0)/T(i)):
             S = S_1
-        if stan_res(size, A, S) < stan_res(size, A, S_2):
+        if calc_residual_using_standard(size, A, S) < calc_residual_using_standard(size, A, S_2):
             S_2 = copy.copy(S)
-    return stan_res(size, A, S_2)
+    return calc_residual_using_standard(size, A, S_2)
 
 #Simulated Annealing -- PP
-def simulated_annealing_pp(size, A, max_iter, start):
+def simulated_annealing_prepartition(size, A, max_iter, start):
     P = start
     P_2 = copy.copy(P)
-    res_0 = KarmarkarKarp(new_A(size, P, A))
-    res_2 = KarmarkarKarp(new_A(size, P_2, A))
+    res_0 = karmarkar_karp(new_sequence_from_prepartition(size, P, A))
+    res_2 = karmarkar_karp(new_sequence_from_prepartition(size, P_2, A))
     for i in range(max_iter):
-        P_1 = rand_neighbor_pp(size, P)
-        res_1 = KarmarkarKarp(new_A(size, P_1, A))
+        P_1 = rand_neighbor_prepartition(size, P)
+        res_1 = karmarkar_karp(new_sequence_from_prepartition(size, P_1, A))
         if res_1 < res_0:
             P = P_1
-            res_0 = KarmarkarKarp(new_A(size, P, A))
+            res_0 = karmarkar_karp(new_sequence_from_prepartition(size, P, A))
         elif random.random() < math.exp(-(res_1 - res_0)/T(i)):
             P = P_1
-            res_0 = KarmarkarKarp(new_A(size, P, A))
+            res_0 = karmarkar_karp(new_sequence_from_prepartition(size, P, A))
         if res_0 < res_2:
             P_2 = copy.copy(P)
-            res_2 = KarmarkarKarp(new_A(size, P_2, A))
-    return KarmarkarKarp(new_A(size, P_2, A))
+            res_2 = karmarkar_karp(new_sequence_from_prepartition(size, P_2, A))
+    return karmarkar_karp(new_sequence_from_prepartition(size, P_2, A))
 
 
 def main():
     A = [10, 8, 7, 6, 5]
     P = [0, 1, 1, 3, 4]
-    A1 = new_A(5, P, A)
+    A1 = new_sequence_from_prepartition(5, P, A)
     
     start_all = time.time()
     
@@ -195,61 +195,61 @@ def main():
         for row in lines:
             instance.append(int(row))
 
-        result = KarmarkarKarp(instance)
+        result = karmarkar_karp(instance)
         print("Residual =", result)
 
     for i in range(trials):
-        stan_start = rand_soln_stan(size)
-        pp_start = rand_soln_pp(size)
+        stan_start = rand_solution_standard(size)
+        pp_start = rand_solution_prepartition(size)
         
-        instance = gen_instance(size)
+        instance = generate_randomize_instance(size)
 
-        #KarmarkarKarp 
+        #karmarkar_karp 
         start = time.time()
-        KK_sum += KarmarkarKarp(instance)
+        KK_sum += karmarkar_karp(instance)
         end = time.time()
         KK_time += (end - start)
         
         #RR_stan
         start = time.time()
-        RR_stan += rept_rand_stan(size, instance, max_iter, stan_start)
+        RR_stan += repeated_random_using_standard(size, instance, max_iter, stan_start)
         end = time.time()
         RR_stan_time += (end - start)
         
         #RR_pp
         start = time.time()
-        RR_pp += rept_rand_pp(size, instance, max_iter, pp_start)
+        RR_pp += repeated_random_using_prepartition(size, instance, max_iter, pp_start)
         end = time.time()
         RR_pp_time += (end - start)
 
         #HC_stan
         start = time.time()
-        HC_stan += hill_climb_stan(size, instance, max_iter, stan_start)
+        HC_stan += hill_climb_standard(size, instance, max_iter, stan_start)
         end = time.time()
         HC_stan_time += (end - start)
 
         #HC_pp
         start = time.time()
-        HC_pp += hill_climb_pp(size, instance, max_iter, pp_start)
+        HC_pp += hill_climb_prepartition(size, instance, max_iter, pp_start)
         end = time.time()
         HC_pp_time += (end - start)
 
         #SA_stan
         start = time.time()
-        SA_stan += simulated_annealing_stan(size, instance, max_iter, stan_start)
+        SA_stan += simulated_annealing_standard(size, instance, max_iter, stan_start)
         end = time.time()
         SA_stan_time += (end - start)
 
         #SA_pp
         start = time.time()
-        SA_pp += simulated_annealing_pp(size, instance, max_iter, pp_start)
+        SA_pp += simulated_annealing_prepartition(size, instance, max_iter, pp_start)
         end = time.time()
         SA_pp_time += (end - start)
 
     end_all = time.time()
     time_all = end_all - start_all
     
-    print("KarmarkarKarp avg: ", int(KK_sum/trials))
+    print("KK avg: ", int(KK_sum/trials))
     print("avg time: ", KK_time/trials)
     print("\n")
     print("RR_stan avg: ", int(RR_stan/trials))
