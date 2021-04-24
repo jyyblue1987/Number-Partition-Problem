@@ -5,21 +5,37 @@ import time
 import sys
 import numpy as np
 
+import heapq
+
+def heapify(x):
+    for i in range(0, len(x)):
+        x[i] = -x[i]
+    heapq.heapify(x)
+
+def push(heap, item):
+    heapq.heappush(heap, -item)
+
+def pop(heap):
+    return -heapq.heappop(heap)
+
+def build_heap(num_arr):
+    heapify(num_arr)
+    return num_arr
+
 def karmarkar_karp(A):
-    S = A.tolist()
-    residual = 0
-    while True:
-        a = max(S)
-        i = S.index(a)
-        S[i] = 0
-        b = max(S)
-        if b == 0:
-            break
-        j = S.index(b)
-        S[i] = abs(a - b)
-        S[j] = 0
-        residual = S[i]
-    return residual
+    S = A.tolist()    
+    heap = build_heap(S)
+    elem1 = pop(heap)
+    elem2 = pop(heap)
+    while (elem2 != 0):
+        push(heap, abs(elem1 - elem2))
+        push(heap, 0)
+
+        #print heap
+        elem1 = pop(heap)
+        elem2 = pop(heap)
+    
+    return elem1
 
 def generate_randomize_instance(size):
     r_max = 10**12
