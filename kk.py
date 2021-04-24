@@ -26,11 +26,7 @@ def generate_randomize_instance(size):
 
 #RepRandom -- Stan
 def rand_solution_standard(size):
-    S = []
-    for i in range(size):
-        s = 1 if (random.random() < 0.5) else -1
-        S.append(s)
-    return S
+    return [1 if (random.random() < 0.5) else -1 for i in range(size)]
 
 def calc_residual_using_standard(size, A, S):
     residual = 0
