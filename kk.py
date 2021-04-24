@@ -20,13 +20,13 @@ def build_heap(num_arr):
     heapify(num_arr)
     return num_arr
 
-def karmarkar_karp(A):
+def karmarkar_karp(A):  # O(nlog(n))
     S = (A * (-1)).tolist()    
-    heap = build_heap(S)
+    heap = build_heap(S)    # O(nlog(n))
     elem1 = pop(heap)
     elem2 = pop(heap)
     while (elem2 != 0):
-        push(heap, abs(elem1 - elem2))
+        push(heap, abs(elem1 - elem2))  # put/pop data it requires log(n)
         push(heap, 0)
 
         #print heap
@@ -168,7 +168,7 @@ def main():
     size = 100
     max_iter = 25000
     # max_iter = 2500
-    trials = 50
+    trials = 100
     
     RR_stan = 0
     RR_pp = 0
