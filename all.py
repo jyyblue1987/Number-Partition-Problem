@@ -156,11 +156,16 @@ def sim_anneal_pp(size, A, max_iter, start):
 
 
 def main():
+    A = [10, 8, 7, 6, 5]
+    P = [0, 1, 1, 3, 4]
+    A1 = new_A(5, P, A)
+    
     start_all = time.time()
     
     random.seed()
     size = 100
-    max_iter = 2500
+    max_iter = 25000
+    # max_iter = 10
     trials = 50
     
     RR_stan = 0
