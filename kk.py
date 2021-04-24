@@ -166,8 +166,8 @@ def main():
     
     random.seed()
     size = 100
-    # max_iter = 25000
-    max_iter = 10
+    max_iter = 25000
+    # max_iter = 2500
     trials = 50
     
     RR_stan = 0
